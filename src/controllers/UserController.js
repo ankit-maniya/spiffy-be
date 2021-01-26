@@ -25,13 +25,16 @@ const login = async (req, res, next) => {
 const signUp = async (req, res, next) => {
   try {
     // upload file using multer
-    await uploadStorage(req, res);
+    await uploadStorage(req, res, (err) => {
+      console.log(req.file);
+      if (!req.file) next();
+    });
     const data = req.body;
 
-    await new Promise((resolve, reject) => {
+    await new Promise(async (resolve, reject) => {
       // user data validation
-      const userValidate = SignupValidate(data);
-      if (userValidate) resolve(userValidate);
+      await SignupValidate(data);
+      resolve("");
     }).then(async () => {
       // check file is uploaded or not!
       if (req.files && req.files.profile[0].filename) {
