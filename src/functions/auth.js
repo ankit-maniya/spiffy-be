@@ -11,7 +11,7 @@ export const createToken = async (data, expire) => {
 };
 
 export const verifyAuthTocken = async (data) => {
-  const token = jwt.verify(data, process.env.TOKEN_SECRET);
+  const token = await jwt.verify(data, process.env.TOKEN_SECRET);
   const user = await model.User.findById({
     _id: token._id,
   });

@@ -3,7 +3,6 @@ import { errorRes, successRes } from "../functions/helper";
 import { model } from "../models";
 import { LoginValidate, SignupValidate } from "../validation/UserSchema";
 import { createToken } from "../functions/auth";
-import _ from "lodash";
 import { validatePassword } from "../models/User";
 
 const login = async (req, res, next) => {
@@ -13,6 +12,7 @@ const login = async (req, res, next) => {
     const iData = await model.User.findOne({
       mobile: data.mobile,
     });
+    if (!iData) throw "Not Valid User";
     const iRes = await validatePassword(data.password, iData.password);
     if (!iRes) throw "Invalid Password !!";
     iData.authToken = await createToken(iData, "1h");
