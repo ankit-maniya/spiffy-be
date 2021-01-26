@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import { isEmail } from "validator";
 import bcrypt from "bcrypt";
-import { config } from "../../config";
-// const ObjectId = mongoose.Schema.Types.ObjectId;
+
+const ObjectId = mongoose.Schema.Types.ObjectId;
 const UserSchema = new mongoose.Schema(
   {
     name: {
@@ -21,31 +21,17 @@ const UserSchema = new mongoose.Schema(
     },
     mobile: {
       type: String,
-      validate: {
-        validator: (value) => {
-          return value.length > 9 && value.length < 14;
-        },
-        message: (value) => {
-          return "Please Enter Proper Mobile Number!";
-        },
-      },
       required: true,
       unique: true,
     },
     password: {
       type: String,
-      validate: {
-        validator: (value) => {
-          var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/;
-          return re.test(value);
-        },
-        message: () => {
-          return "At least one number,one speacial character, one lowercase and one uppercase letter at least eight characters Ex:ab$AB12@";
-        },
-      },
       required: true,
     },
     profile: {
+      type: String,
+    },
+    authToken: {
       type: String,
     },
   },
@@ -61,8 +47,9 @@ UserSchema.methods.generatePasswordHash = async function () {
   return await bcrypt.hash(this.password, saltRounds);
 };
 
-UserSchema.methods.validatePassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
+export const validatePassword = async function (password, hashPassword) {
+  console.log(password, hashPassword);
+  return await bcrypt.compare(password, hashPassword);
 };
 
 const User = mongoose.model("User", UserSchema);

@@ -57,6 +57,26 @@ export const SignupValidate = async (req) => {
   }
 };
 
+export const LoginValidate = async (req) => {
+  const keys = Object.keys(req);
+  // mobile
+  if ((Array.isArray(keys) && !keys.includes("mobile")) || req.mobile == "") {
+    throw "Please Enter Mobile";
+  } else {
+    if (!checkMobile(req.mobile)) {
+      throw "Please Enter Valid Mobile";
+    }
+  }
+
+  // password & repassword
+  if (
+    (Array.isArray(keys) && !keys.includes("password")) ||
+    req.password == ""
+  ) {
+    throw "Please Enter password";
+  }
+};
+
 const checkMobile = (data) => {
   if (data.length < 10 && 13 > data.length) return false;
   return true;

@@ -1,12 +1,26 @@
 import { uploadStorage } from "../functions/uploadfile";
 import { errorRes, successRes } from "../functions/helper";
 import { model } from "../models";
-import { SignupValidate } from "../validation/UserSchema";
+import { LoginValidate, SignupValidate } from "../validation/UserSchema";
 import { createToken } from "../functions/auth";
+import _ from "lodash";
+import { validatePassword } from "../models/User";
 
-// const login = async (req, res, next) => {
-//   await model.User.validatePassword()
-// };
+const login = async (req, res, next) => {
+  try {
+    const data = req.body;
+    await LoginValidate(data);
+    const iData = await model.User.findOne({
+      mobile: data.mobile,
+    });
+    const iRes = await validatePassword(data.password, iData.password);
+    if (!iRes) throw "Invalid Password !!";
+    iData.authToken = await createToken(iData, "1h");
+    res.send(successRes(iData));
+  } catch (error) {
+    res.send(errorRes(error));
+  }
+};
 
 const signUp = async (req, res, next) => {
   try {
@@ -18,24 +32,14 @@ const signUp = async (req, res, next) => {
       // user data validation
       const userValidate = SignupValidate(data);
       if (userValidate) resolve(userValidate);
-      reject(userValidate);
     }).then(async () => {
       // check file is uploaded or not!
       if (req.files && req.files.profile[0].filename) {
         data["profile"] = req.files.profile[0].filename;
       }
-      await model.User.create(data).exec((fres, ferr) => {
-        if (fres) {
-          console.log(fres);
-        } else {
-          // console.log("ds", ferr);
-        }
-      });
-      const iRes = [];
-      // const token = await createToken(userData, "1h");
-      // userData.token = token;
-      // console.log(userData);
-      res.send(successRes("dvkh"));
+      let userData = await model.User.create(data);
+      userData.authToken = await createToken(userData, "1h");
+      res.send(successRes(userData));
     });
   } catch (error) {
     res.send(errorRes(error));
@@ -43,6 +47,6 @@ const signUp = async (req, res, next) => {
 };
 
 export const UserController = {
-  // login,
+  login,
   signUp,
 };
