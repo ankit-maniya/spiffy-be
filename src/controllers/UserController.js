@@ -28,7 +28,7 @@ const signUp = async (req, res, next) => {
         if (fres) {
           console.log(fres);
         } else {
-          console.log("ds", ferr);
+          // console.log("ds", ferr);
         }
       });
       const iRes = [];
