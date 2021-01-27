@@ -34,7 +34,7 @@ const signUp = async (req, res, next) => {
       resolve("");
     }).then(async () => {
       // check file is uploaded or not!
-      if (req.files && req.files.profile[0].filename) {
+      if (req.files && req.files.profile) {
         data["profile"] = req.files.profile[0].filename;
       }
       let userData = await model.User.create(data);
