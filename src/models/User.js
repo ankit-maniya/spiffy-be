@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema(
     profile: {
       type: String,
     },
+    isActive:{
+        type:Boolean,
+        default:true,
+    },
     authToken: {
       type: String,
     },
@@ -48,7 +52,6 @@ UserSchema.methods.generatePasswordHash = async function () {
 };
 
 export const validatePassword = async function (password, hashPassword) {
-  console.log(password, hashPassword);
   return await bcrypt.compare(password, hashPassword);
 };
 
