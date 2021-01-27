@@ -25,10 +25,7 @@ const login = async (req, res, next) => {
 const signUp = async (req, res, next) => {
   try {
     // upload file using multer
-    await uploadStorage(req, res, (err) => {
-      console.log(req.file);
-      if (!req.file) next();
-    });
+    await uploadStorage(req, res);
     const data = req.body;
 
     await new Promise(async (resolve, reject) => {
