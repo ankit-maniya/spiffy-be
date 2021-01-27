@@ -31,12 +31,17 @@ const UserSchema = new mongoose.Schema(
     profile: {
       type: String,
     },
-    isActive:{
-        type:Boolean,
-        default:true,
+    isActive: {
+      type: Boolean,
+      default: true,
     },
     authToken: {
       type: String,
+    },
+    role: {
+      type: String,
+      default: "USER",
+      enum: ["USER", "RESTAURENT", "ADMIN"],
     },
   },
   { timestamps: true }
