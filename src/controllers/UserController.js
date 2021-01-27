@@ -49,7 +49,18 @@ const signUp = async (req, res, next) => {
     }
 };
 
+
+const updateUser = async(req, res, next) =>{
+    const {_id}=req.user
+    try {
+        res.send(successRes(_id))
+    } catch (error) {
+        res.send(errorRes(error.message))
+    }
+}
+
 export const UserController = {
     login,
     signUp,
+    updateUser,
 };
