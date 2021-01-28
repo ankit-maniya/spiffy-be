@@ -35,7 +35,5 @@ export const uploadStorage = pify(
     fileFilter: async (req, file, cb) => {
       checkfiletype(file, cb);
     },
-  }).fields([{ name: "profile", maxCount: 1 }])
+  }).fields([{ name: "profile", maxCount: 1 },{ name: "restaurentBanner", maxCount: 1 }])
 );
-
-// upload file using

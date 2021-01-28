@@ -6,7 +6,6 @@ const User = express.Router();
 
 User.get("/", UserController.login);
 User.post("/", UserController.signUp);
-
 User.patch("/", me, UserController.updateUser);
 
 export default User;

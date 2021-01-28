@@ -1,4 +1,5 @@
 import User from "./User";
+import Restaurent from "./Restaurent"
 import mongoose from "mongoose";
 import { config } from "../../config";
 
@@ -13,4 +14,5 @@ const connectDB = async () => {
 export { connectDB };
 export const model = {
   User,
+  Restaurent
 };
