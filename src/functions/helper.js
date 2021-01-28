@@ -37,7 +37,7 @@ export const removeFile = (file, role = "TEMP", folder = "") => {
 export const moveFile = (file, userId, role = "TEMP") => {
   const userDirPath = path.join(
     config.FILE_STORE_PATH,
-    "USER",
+    role,
     userId.toString()
   );
   const currentPath = path.join(config.FILE_STORE_PATH, "TEMP", file);
