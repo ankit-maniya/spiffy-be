@@ -6,7 +6,6 @@ const MenuSchema = new mongoose.Schema(
     menuName: {
       type: String,
       required: true,
-      unique: true,
     },
     restaurentId: {
       type: ObjectId,

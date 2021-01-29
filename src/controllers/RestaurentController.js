@@ -1,9 +1,7 @@
 import { uploadStorage } from "../functions/uploadfile";
-import {
+import helper ,{
   errorRes,
   successRes,
-  removeFile,
-  moveFile,
 } from "../functions/helper";
 import { model } from "../models";
 import {
@@ -46,7 +44,7 @@ const signUp = async (req, res, next) => {
     if (validation) {
       if (req.files && req.files.profile && req.files.profile[0].filename) {
         // if error remove file
-        removeFile(req.files.profile[0].filename, "TEMP");
+        await helper.removeFile(req.files.profile[0].filename, "TEMP");
       }
       if (
         req.files &&
@@ -54,7 +52,7 @@ const signUp = async (req, res, next) => {
         req.files.restaurentBanner[0].filename
       ) {
         // if error remove file
-        removeFile(req.files.restaurentBanner[0].filename, "TEMP");
+        await helper.removeFile(req.files.restaurentBanner[0].filename, "TEMP");
       }
 
       throw { message: validation }; //   throw error
@@ -75,11 +73,11 @@ const signUp = async (req, res, next) => {
     let RestaurentData = await model.Restaurent.create(data); // add Restaurent data
     if (req.files && req.files.profile) {
       // move file from TEMP location to RESTAURENT
-      await moveFile(RestaurentData.profile, RestaurentData._id, "RESTAURENT");
+      await helper.moveFile(RestaurentData.profile, RestaurentData._id, "RESTAURENT");
     }
     if (req.files && req.files.restaurentBanner) {
       // move file from TEMP location to RESTAURENT
-      await moveFile(
+      await helper.moveFile(
         RestaurentData.restaurentBanner,
         RestaurentData._id,
         "RESTAURENT"
@@ -106,7 +104,7 @@ const updateRestaurent = async (req, res, next) => {
     if (validation) {
       if (req.files && req.files.profile && req.files.profile[0].filename) {
         // if error remove file
-        removeFile(req.files.profile[0].filename, "TEMP");
+        await helper.removeFile(req.files.profile[0].filename, "TEMP");
       }
       if (
         req.files &&
@@ -114,7 +112,7 @@ const updateRestaurent = async (req, res, next) => {
         req.files.restaurentBanner[0].filename
       ) {
         // if error remove file
-        removeFile(req.files.restaurentBanner[0].filename, "TEMP");
+        await helper.removeFile(req.files.restaurentBanner[0].filename, "TEMP");
       }
       throw { message: validation };
     }
@@ -125,10 +123,10 @@ const updateRestaurent = async (req, res, next) => {
     if (req.files && req.files.profile && req.files.profile[0].filename) {
       // set profile for add name in database
       updateData["profile"] = req.files.profile[0].filename;
-      await moveFile(updateData["profile"], _id, "RESTAURENT"); //move latest file role wise
+      await helper.moveFile(updateData["profile"], _id, "RESTAURENT"); //move latest file role wise
       if (profile) {
         //delete old file
-        removeFile(profile, "RESTAURENT", _id);
+        helper.removeFile(profile, "RESTAURENT", _id);
       }
     }
     if (
@@ -138,10 +136,10 @@ const updateRestaurent = async (req, res, next) => {
     ) {
       // set Restaurent Banner for add name in database
       updateData["restaurentBanner"] = req.files.restaurentBanner[0].filename;
-      await moveFile(updateData["restaurentBanner"], _id, "RESTAURENT"); //move latest file role wise
+      await helper.moveFile(updateData["restaurentBanner"], _id, "RESTAURENT"); //move latest file role wise
       if (restaurentBanner) {
         //delete old file
-        removeFile(restaurentBanner, "RESTAURENT", _id);
+        helper.removeFile(restaurentBanner, "RESTAURENT", _id);
       }
     }
 

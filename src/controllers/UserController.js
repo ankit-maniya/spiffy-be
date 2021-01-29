@@ -1,9 +1,7 @@
 import { uploadStorage } from "../functions/uploadfile";
-import {
+import helper,{
   errorRes,
-  successRes,
-  removeFile,
-  moveFile,
+  successRes
 } from "../functions/helper";
 import { model } from "../models";
 import {
@@ -45,7 +43,7 @@ const signUp = async (req, res, next) => {
     if (validation) {
       if (req.files && req.files.profile && req.files.profile[0].filename) {
         // if error remove file
-        removeFile(req.files.profile[0].filename, "TEMP");
+        helper.removeFile(req.files.profile[0].filename, "TEMP");
       }
       throw { message: validation }; //   throw error
     }
@@ -56,7 +54,7 @@ const signUp = async (req, res, next) => {
     let userData = await model.User.create(data); // add user data
     if (req.files && req.files.profile) {
       // move file from TEMP location
-      await moveFile(userData.profile, userData._id, "USER");
+      await helper.moveFile(userData.profile, userData._id, "USER");
     }
     userData.authToken = await createToken(userData, "1h"); // create authtoken
     res.send(successRes(userData)); // get success response
@@ -74,7 +72,7 @@ const updateUser = async (req, res, next) => {
     if (validation) {
       if (req.files && req.files.profile && req.files.profile[0].filename) {
         // if error remove file
-        removeFile(req.files.profile[0].filename, "TEMP");
+        helper.removeFile(req.files.profile[0].filename, "TEMP");
       }
       throw { message: validation };
     }
@@ -87,10 +85,10 @@ const updateUser = async (req, res, next) => {
     if (req.files && req.files.profile && req.files.profile[0].filename) {
       // set profile for add name in database
       updateData["profile"] = req.files.profile[0].filename;
-      await moveFile(updateData["profile"], _id, "USER"); //move latest file role wise
+      await helper.moveFile(updateData["profile"], _id, "USER"); //move latest file role wise
       if (profile) {
         //delete old file
-        removeFile(profile, "USER", _id);
+        helper.removeFile(profile, "USER", _id);
       }
     }
     const user = await model.User.findByIdAndUpdate(
