@@ -87,6 +87,7 @@ const moveMenuFile = async (RestaurentId, MenuId, role = "MENU", file) => {
         MenuId.toString(),
         file
     );
+    debugger
     //Check Dir Exist
     if (!fs.existsSync(MenuDirPath)) {
         //check first MENU Dir exist in RESTAURENT folder or not
@@ -123,6 +124,7 @@ const moveMenuFile = async (RestaurentId, MenuId, role = "MENU", file) => {
                         throw errmove;
                     }
                 });
+                debugger
             } else {//MENU_ID directory Exist in MENU
                 //perform move file task perticuler location
                 fs.rename(currentTempPath, destinationPath, function (errmove) {

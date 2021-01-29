@@ -2,6 +2,8 @@ import helper, { errorRes, successRes } from "../functions/helper";
 import { uploadStorage } from "../functions/uploadfile";
 import { model } from "../models";
 import MenuSchema from "../validation/MenuSchema";
+import mongoose from  "mongoose"
+const ObjectId = mongoose.Types.ObjectId
 const getMenu = async (req, res, next) => {
     try {
         res.send(successRes("Get Menu"));
@@ -45,7 +47,7 @@ const updateMenu = async (req, res, next) => {
     try {
         await uploadStorage(req, res); // upload file using multer as a middle ware
         const { _id } = req.restaurent; // login Restaurent data
-    
+        
         const updateData = JSON.parse(JSON.stringify(req.body)); // remove unusual [obj]
         const validation = await MenuSchema.UpdateMenuValidate(updateData, _id); // validate a key and value
         if (validation) {
@@ -59,6 +61,14 @@ const updateMenu = async (req, res, next) => {
           }
           throw { message: validation };
         }
+
+        const oldMenuData = await model.Menu.findOne({
+            _id:updateData.menuId
+        })
+
+        if(!oldMenuData){
+            throw {message:"Menu Id is Invalid"}
+        }
         if (
           req.files &&
           req.files.menuBanner &&
@@ -67,23 +77,26 @@ const updateMenu = async (req, res, next) => {
           // set Restaurent Banner for add name in database
           updateData["menuBanner"] = req.files.menuBanner[0].filename;
           await helper.moveFile(updateData["menuBanner"], _id, "MENU"); //move latest file role wise
-          if (menuBanner) {
+          
+          if (oldMenuData && oldMenuData.menuBanner) {
             //delete old file
-            helper.removeFile(menuBanner, "MENU", _id);
+            helper.removeFile(oldMenuData.menuBanner, "MENU", _id);
+
           }
+
         }
-    debugger
-        const Menu = await model.Menu.findByIdAndUpdate(
-          // update Menu data and get latest data
-          {
-            _id: _id,
-          },
-          {
-            $set: updateData,
-          },
-          { new: true }
-        );
-        res.send(successRes(Menu)); // get success response
+        debugger
+        console.log(typeof oldMenuData._id);
+        // update Menu data and get latest data
+        model.Menu.findOne({
+            _id:updateData.menuId
+        }).then((res)=>{
+            res.send(successRes(res)); // get success response
+            debugger
+        }).catch((err)=>{
+            res.send(successRes(err)); // get success response
+            debugger
+        })
       } catch (error) {
         res.send(errorRes(error.message)); // get error response
       }
