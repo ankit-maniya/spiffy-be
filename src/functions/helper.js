@@ -70,3 +70,5 @@ export const moveFile = (file, userId, role = "TEMP") => {
     });
   }
 };
+
+const mkDir = () => {};

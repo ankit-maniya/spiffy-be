@@ -6,8 +6,9 @@ const Menu = express.Router();
 /** For Authentication  */
 Menu.use(me);
 /** All Menu Routes */
-Menu.get("/", MenuController.addMenu);
-Menu.post("/", MenuController.deleteMenu);
+Menu.get("/", MenuController.getMenu);
+Menu.post("/", MenuController.addMenu);
 Menu.patch("/", MenuController.updateMenu);
+Menu.get("/:id", MenuController.deleteMenu);
 
 export default Menu;

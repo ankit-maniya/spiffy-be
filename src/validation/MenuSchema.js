@@ -1,12 +1,16 @@
 import { model } from "../models";
 
-const MenuValidate = (req, LoginId) => {
+const InsertMenuValidate = (req, LoginId) => {
   return new Promise(async (resolve, reject) => {
     const keys = Object.keys(req);
 
     // Restaurent id
-    if (Array.isArray(keys) && keys.includes("restaurentId")) {
+    if (Array.isArray(keys) && !keys.includes("restaurentId")) {
       resolve("Please Enter A restaurentId");
+    } else {
+      if (keys.includes("restaurentId") && req.restaurentId == "") {
+        resolve("restaurentId not be empty!");
+      }
     }
 
     // Menu Name
@@ -76,4 +80,5 @@ const UpdateMenuValidate = (req, LoginId) => {
   });
 };
 
-export const MenuSchema = { MenuValidate, UpdateMenuValidate };
+const MenuSchema = { InsertMenuValidate, UpdateMenuValidate };
+export default MenuSchema;

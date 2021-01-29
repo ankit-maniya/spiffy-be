@@ -86,6 +86,7 @@ RestaurentSchema.methods.generatePasswordHash = async function () {
 };
 
 export const validatePassword = async function (password, hashPassword) {
+  debugger;
   return await bcrypt.compare(password, hashPassword);
 };
 

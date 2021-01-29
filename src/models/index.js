@@ -1,6 +1,7 @@
 import User from "./User";
 import Restaurent from "./Restaurent";
 import Address from "./Address";
+import Menu from "./Menu";
 import mongoose from "mongoose";
 import { config } from "../../config";
 
@@ -17,4 +18,5 @@ export const model = {
   User,
   Restaurent,
   Address,
+  Menu,
 };

@@ -24,6 +24,7 @@ const logIn = async (req, res, next) => {
       mobile: data.mobile,
     });
     if (!iData) throw { message: "Not Valid Restaurent User" };
+    debugger;
     const iRes = await validatePassword(data.password, iData.password); //check password match or not
     if (!iRes) throw { message: "Invalid Password !!" };
     iData.authToken = await createToken(iData, "1h"); // create authtoken
