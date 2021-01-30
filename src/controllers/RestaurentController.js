@@ -1,32 +1,31 @@
-import { uploadStorage } from "../functions/uploadfile";
+import { uploadFileToStorage } from "../functions/uploadfile";
 import helper ,{
   errorRes,
   successRes,
 } from "../functions/helper";
 import { model } from "../models";
-import {
-  LoginValidate,
-  SignupValidate,
-  UpdateRestaurentValidate,
-} from "../validation/RestaurentSchema";
+import RestaurentValidationSchema from "../validation/RestaurentSchema"
 import { createToken } from "../functions/auth";
 import { validatePassword } from "../models/Restaurent";
 
 const logIn = async (req, res, next) => {
   try {
-    const data = req.body;
+    const bodyData = req.body;
 
-    await LoginValidate(data); //validate a key and value
-    const iData = await model.Restaurent.findOne({
+    const isValidate = await RestaurentValidationSchema.checkLoginInputValidate(bodyData); //validate a key and value
+    if(isValidate.statuscode != 1){
+        throw {message:isValidate.message}
+    }
+    const iUser = await model.Restaurent.findOne({
       //find Restaurent with this mobile
-      mobile: data.mobile,
+      mobile: bodyData.mobile,
     });
-    if (!iData) throw { message: "Not Valid Restaurent User" };
+    if (!iUser) throw { message: "Not Valid Restaurent User" };
     debugger;
-    const iRes = await validatePassword(data.password, iData.password); //check password match or not
-    if (!iRes) throw { message: "Invalid Password !!" };
-    iData.authToken = await createToken(iData, "1h"); // create authtoken
-    res.send(successRes(iData)); // get success response
+    const iMatchPassword = await validatePassword(bodyData.password, iUser.password); //check password match or not
+    if (!iMatchPassword) throw { message: "Invalid Password !!" };
+    iUser.authToken = await createToken(iUser, "1h"); // create authtoken
+    res.send(successRes(iUser)); // get success response
   } catch (error) {
     res.send(errorRes(error.message)); // get error response
   }
@@ -34,14 +33,14 @@ const logIn = async (req, res, next) => {
 
 const signUp = async (req, res, next) => {
   try {
-    await uploadStorage(req, res); // upload file using multer
-    const data = req.body;
+    await uploadFileToStorage(req, res); // upload file using multer
+    const bodyData = req.body;
     if (req.body.address) {
-      data.address = JSON.parse(req.body.address); // address is json stringyfied
+      bodyData.address = JSON.parse(req.body.address); // address is json stringyfied
     }
-    const validation = await SignupValidate(data); // validate a key and value
+    const isValidate = await RestaurentValidationSchema.checkSignupInputValidate(bodyData); // validate a key and value
 
-    if (validation) {
+    if (isValidate.statuscode != 1) {
       if (req.files && req.files.profile && req.files.profile[0].filename) {
         // if error remove file
         await helper.removeFile(req.files.profile[0].filename, "TEMP");
@@ -55,11 +54,11 @@ const signUp = async (req, res, next) => {
         await helper.removeFile(req.files.restaurentBanner[0].filename, "TEMP");
       }
 
-      throw { message: validation }; //   throw error
+      throw { message: isValidate.message }; //   throw error
     }
     if (req.files && req.files.profile && req.files.profile[0].filename) {
       // set profile for add name in database
-      data["profile"] = req.files.profile[0].filename;
+      bodyData["profile"] = req.files.profile[0].filename;
     }
     if (
       req.files &&
@@ -67,10 +66,10 @@ const signUp = async (req, res, next) => {
       req.files.restaurentBanner[0].filename
     ) {
       // set restaurent banner for add name in database
-      data["restaurentBanner"] = req.files.restaurentBanner[0].filename;
+      bodyData["restaurentBanner"] = req.files.restaurentBanner[0].filename;
     }
 
-    let RestaurentData = await model.Restaurent.create(data); // add Restaurent data
+    let RestaurentData = await model.Restaurent.create(bodyData); // add Restaurent bodyData
     if (req.files && req.files.profile) {
       // move file from TEMP location to RESTAURENT
       await helper.moveFile(RestaurentData.profile, RestaurentData._id, "RESTAURENT");
@@ -92,16 +91,16 @@ const signUp = async (req, res, next) => {
 
 const updateRestaurent = async (req, res, next) => {
   try {
-    await uploadStorage(req, res); // upload file using multer as a middle ware
-    const { _id, profile, restaurentBanner, address } = req.restaurent; // login Restaurent data
+    await uploadFileToStorage(req, res); // upload file using multer as a middle ware
+    const { _id, profile, restaurentBanner, address } = req.restaurent; // login Restaurent bodyData
 
-    const updateData = JSON.parse(JSON.stringify(req.body)); // remove unusual [obj]
-    if (updateData.address) {
-      updateData.address = JSON.parse(updateData.address); // address is json stringyfied
-      console.log(updateData.address);
+    const bodyData = JSON.parse(JSON.stringify(req.body)); // remove unusual [obj]
+    if (bodyData.address) {
+      bodyData.address = JSON.parse(bodyData.address); // address is json stringyfied
+      console.log(bodyData.address);
     }
-    const validation = await UpdateRestaurentValidate(updateData, _id); // validate a key and value
-    if (validation) {
+    const isValidate = await RestaurentValidationSchema.checkUpdateInputValidate(bodyData, _id); // validate a key and value
+    if (isValidate.statuscode != 1) {
       if (req.files && req.files.profile && req.files.profile[0].filename) {
         // if error remove file
         await helper.removeFile(req.files.profile[0].filename, "TEMP");
@@ -114,16 +113,18 @@ const updateRestaurent = async (req, res, next) => {
         // if error remove file
         await helper.removeFile(req.files.restaurentBanner[0].filename, "TEMP");
       }
-      throw { message: validation };
+      throw { message: isValidate.message };
     }
-    if (updateData["address"]) {
-      Array.prototype.push.apply(updateData["address"], address);
+
+    // combine old Address with new Address
+    if (bodyData["address"]) {
+      Array.prototype.push.apply(bodyData["address"], address);
     }
 
     if (req.files && req.files.profile && req.files.profile[0].filename) {
       // set profile for add name in database
-      updateData["profile"] = req.files.profile[0].filename;
-      await helper.moveFile(updateData["profile"], _id, "RESTAURENT"); //move latest file role wise
+      bodyData["profile"] = req.files.profile[0].filename;
+      await helper.moveFile(bodyData["profile"], _id, "RESTAURENT"); //move latest file role wise
       if (profile) {
         //delete old file
         helper.removeFile(profile, "RESTAURENT", _id);
@@ -134,22 +135,22 @@ const updateRestaurent = async (req, res, next) => {
       req.files.restaurentBanner &&
       req.files.restaurentBanner[0].filename
     ) {
-      // set Restaurent Banner for add name in database
-      updateData["restaurentBanner"] = req.files.restaurentBanner[0].filename;
-      await helper.moveFile(updateData["restaurentBanner"], _id, "RESTAURENT"); //move latest file role wise
+      // add new RestaurentBanner name for update in database
+      bodyData["restaurentBanner"] = req.files.restaurentBanner[0].filename;
+      await helper.moveFile(bodyData["restaurentBanner"], _id, "RESTAURENT"); //move latest file role wise
       if (restaurentBanner) {
-        //delete old file
+        //delete old uploaded file
         helper.removeFile(restaurentBanner, "RESTAURENT", _id);
       }
     }
 
     const Restaurent = await model.Restaurent.findByIdAndUpdate(
-      // update Restaurent data and get latest data
+      // update Restaurent bodyData and get latest bodyData
       {
         _id: _id,
       },
       {
-        $set: updateData,
+        $set: bodyData,
       },
       { new: true }
     );

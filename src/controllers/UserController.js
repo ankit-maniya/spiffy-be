@@ -1,114 +1,111 @@
-import { uploadStorage } from "../functions/uploadfile";
-import helper,{
-  errorRes,
-  successRes
+import { uploadFileToStorage } from "../functions/uploadfile";
+import helper, {
+    errorRes,
+    successRes
 } from "../functions/helper";
 import { model } from "../models";
-import {
-  LoginValidate,
-  SignupValidate,
-  UpdateUserValidate,
-} from "../validation/UserSchema";
+import Userschema, { } from "../validation/UserSchema";
 import { createToken } from "../functions/auth";
 import { validatePassword } from "../models/User";
 
 const login = async (req, res, next) => {
-  try {
-    const data = req.body;
-
-    await LoginValidate(data); //validate a key and value
-    const iData = await model.User.findOne({
-      //find user with this mobile
-      mobile: data.mobile,
-    });
-    if (!iData) throw { message: "Not Valid User" };
-    const iRes = await validatePassword(data.password, iData.password); //check password match or not
-    if (!iRes) throw { message: "Invalid Password !!" };
-    iData.authToken = await createToken(iData, "1h"); // create authtoken
-    res.send(successRes(iData)); // get success response
-  } catch (error) {
-    res.send(errorRes(error.message)); // get error response
-  }
+    try {
+        const bodyData = req.body;
+        const isValidate = await Userschema.checkLoginInputValidate(bodyData); //validate a key and value
+        if (isValidate.statuscode != 1) {
+            throw {message:isValidate.message}
+        }
+        const iUser = await model.User.findOne({
+            //find user with this mobile
+            mobile: bodyData.mobile,
+        });
+        if (!iUser) throw { message: "Not Valid User" };
+        const iMatchPassword = await validatePassword(bodyData.password, iUser.password); //check password match or not
+        if (!iMatchPassword) throw { message: "Invalid Password !!" };
+        iUser.authToken = await createToken(iUser, "1h"); // create authtoken
+        res.send(successRes(iUser)); // get success response
+    } catch (error) {
+        res.send(errorRes(error.message)); // get error response
+    }
 };
 
 const signUp = async (req, res, next) => {
-  try {
-    await uploadStorage(req, res); // upload file using multer
-    const data = req.body;
-    if (req.body.address) {
-      data.address = JSON.parse(req.body.address); // address is json stringyfied
+    try {
+        await uploadFileToStorage(req, res); // upload file using multer
+        const bodyData = req.body;
+        if (req.body.address) {
+            bodyData.address = JSON.parse(req.body.address); // address is json stringyfied
+        }
+        const isValidate = await Userschema.checkSignupInputValidate(bodyData); // validate a key and value
+        if (isValidate.statuscode != 1) {
+            if (req.files && req.files.profile && req.files.profile[0].filename) {
+                // if error remove file
+                helper.removeFile(req.files.profile[0].filename, "TEMP");
+            }
+            throw { message: isValidate.message }
+        }
+        if (req.files && req.files.profile && req.files.profile[0].filename) {
+            // set profile for add name in database
+            bodyData["profile"] = req.files.profile[0].filename;
+        }
+        let userData = await model.User.create(bodyData); // add user bodyData
+        if (req.files && req.files.profile) {
+            // move file from TEMP location
+            await helper.moveFile(userData.profile, userData._id, "USER");
+        }
+        userData.authToken = await createToken(userData, "1h"); // create authtoken
+        res.send(successRes(userData)); // get success response
+    } catch (error) {
+        res.send(errorRes(error.message)); // get error response
     }
-    const validation = await SignupValidate(data); // validate a key and value
-
-    if (validation) {
-      if (req.files && req.files.profile && req.files.profile[0].filename) {
-        // if error remove file
-        helper.removeFile(req.files.profile[0].filename, "TEMP");
-      }
-      throw { message: validation }; //   throw error
-    }
-    if (req.files && req.files.profile && req.files.profile[0].filename) {
-      // set profile for add name in database
-      data["profile"] = req.files.profile[0].filename;
-    }
-    let userData = await model.User.create(data); // add user data
-    if (req.files && req.files.profile) {
-      // move file from TEMP location
-      await helper.moveFile(userData.profile, userData._id, "USER");
-    }
-    userData.authToken = await createToken(userData, "1h"); // create authtoken
-    res.send(successRes(userData)); // get success response
-  } catch (error) {
-    res.send(errorRes(error.message)); // get error response
-  }
 };
 
 const updateUser = async (req, res, next) => {
-  try {
-    await uploadStorage(req, res); // upload file using multer as a middle ware
-    const { _id, profile } = req.user; // login user data
-    const updateData = JSON.parse(JSON.stringify(req.body)); // remove unusual [obj]
-    const validation = await UpdateUserValidate(updateData, _id); // validate a key and value
-    if (validation) {
-      if (req.files && req.files.profile && req.files.profile[0].filename) {
-        // if error remove file
-        helper.removeFile(req.files.profile[0].filename, "TEMP");
-      }
-      throw { message: validation };
-    }
+    try {
+        await uploadFileToStorage(req, res); // upload file using multer as a middle ware
+        const { _id, profile } = req.user; // login user bodyData
+        const updateData = JSON.parse(JSON.stringify(req.body)); // remove unusual [obj]
+        const isValidate = await Userschema.checkUpdateUserInputValidate(updateData, _id); // validate a key and value
+        if (isValidate.statuscode != 1) {
+            if (req.files && req.files.profile && req.files.profile[0].filename) {
+                // if error remove file
+                helper.removeFile(req.files.profile[0].filename, "TEMP");
+            }
+            throw { message: isValidate.message }
+        }
 
-    // add address with push old address (combine)
-    if (updateData["address"]) {
-      Array.prototype.push.apply(updateData["address"], address);
-    }
+        // add address with push old address (combine)
+        if (updateData["address"]) {
+            Array.prototype.push.apply(updateData["address"], address);
+        }
 
-    if (req.files && req.files.profile && req.files.profile[0].filename) {
-      // set profile for add name in database
-      updateData["profile"] = req.files.profile[0].filename;
-      await helper.moveFile(updateData["profile"], _id, "USER"); //move latest file role wise
-      if (profile) {
-        //delete old file
-        helper.removeFile(profile, "USER", _id);
-      }
+        if (req.files && req.files.profile && req.files.profile[0].filename) {
+            // set profile for add name in database
+            updateData["profile"] = req.files.profile[0].filename;
+            await helper.moveFile(updateData["profile"], _id, "USER"); //move latest file role wise
+            if (profile) {
+                //delete old file
+                helper.removeFile(profile, "USER", _id);
+            }
+        }
+        const user = await model.User.findByIdAndUpdate(
+            // update user bodyData and get latest bodyData
+            {
+                _id: _id,
+            },
+            {
+                $set: updateData,
+            },
+            { new: true }
+        );
+        res.send(successRes(user)); // get success response
+    } catch (error) {
+        res.send(errorRes(error.message)); // get error response
     }
-    const user = await model.User.findByIdAndUpdate(
-      // update user data and get latest data
-      {
-        _id: _id,
-      },
-      {
-        $set: updateData,
-      },
-      { new: true }
-    );
-    res.send(successRes(user)); // get success response
-  } catch (error) {
-    res.send(errorRes(error.message)); // get error response
-  }
 };
 
 export const UserController = {
-  login,
-  signUp,
-  updateUser,
+    login,
+    signUp,
+    updateUser,
 };

@@ -1,17 +1,18 @@
 import fs from "fs";
 import path from "path";
 import { config } from "../../config";
-const errorRes = (error) => {
+const errorRes = (message) => {
     const iRes = {
         statuscode: 0,
-        data: { error },
+        message,
     };
     return iRes;
 };
 
-const successRes = (data) => {
+const successRes = (data, message = "Successfully Data Fetched!") => {
     const iRes = {
         statuscode: 1,
+        message,
         data,
     };
     return iRes;
@@ -71,53 +72,27 @@ const moveFile = (file, userId, role = "TEMP") => {
     }
 };
 
-// MENU DIR CREATE
-const moveMenuFile = async (RestaurentId, MenuId, role = "MENU", file) => {
+// MENU Directory CREATE
+const moveMenuFile = async (restaurentId, menuId, role = "MENU", file) => {
     const MenuDirPath = path.join(
         config.RESTAURENT_FILE_STORE_PATH,
-        RestaurentId,
-        role,
-        MenuId.toString()
+        restaurentId,
+        role
     );
     const currentTempPath = path.join(config.FILE_STORE_PATH, "TEMP", file);
     const destinationPath = path.join(
         config.RESTAURENT_FILE_STORE_PATH,
-        RestaurentId,
+        restaurentId,
         role,
-        MenuId.toString(),
         file
     );
     debugger
-    //Check Dir Exist
+    //Check Directory Exist
     if (!fs.existsSync(MenuDirPath)) {
-        //check first MENU Dir exist in RESTAURENT folder or not
-        if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role))) {
+        //check first MENU Directory exist in RESTAURENT folder or not
+        if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, restaurentId, role))) {
             //Create A MENU directory in RESTAURENT
-            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role)) {
-                //check first MENU_ID Dir exist in MENU folder or not
-                if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, MenuId.toString()))) {
-                    //Create A MENU_ID directory in MENU
-                    if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, MenuId.toString())) {
-                        //perform move file task perticuler location
-                        fs.rename(currentTempPath, destinationPath, function (errmove) {
-                            if (errmove) {
-                                throw errmove;
-                            }
-
-                        });
-
-                    }
-                } else {//MENU_ID directory Exist in MENU
-                    //perform move file task perticuler location
-                    fs.rename(currentTempPath, destinationPath, function (errmove) {
-                        if (errmove) {
-                            throw errmove;
-                        }
-                    });
-                }
-            }
-        } else { //MENU Dir exist in RESTAURENT folder 
-            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, MenuId.toString())) {
+            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, restaurentId, role)) {
                 //perform move file task perticuler location
                 fs.rename(currentTempPath, destinationPath, function (errmove) {
                     if (errmove) {
@@ -125,14 +100,14 @@ const moveMenuFile = async (RestaurentId, MenuId, role = "MENU", file) => {
                     }
                 });
                 debugger
-            } else {//MENU_ID directory Exist in MENU
-                //perform move file task perticuler location
-                fs.rename(currentTempPath, destinationPath, function (errmove) {
-                    if (errmove) {
-                        throw errmove;
-                    }
-                });
             }
+        } else { //MENU Directory exist in RESTAURENT folder 
+            //perform move file task perticuler location
+            fs.rename(currentTempPath, destinationPath, function (errmove) {
+                if (errmove) {
+                    throw errmove;
+                }
+            });
         }
     } else {
         fs.rename(currentTempPath, destinationPath, function (errmove) {
@@ -143,66 +118,42 @@ const moveMenuFile = async (RestaurentId, MenuId, role = "MENU", file) => {
     }
 }
 
-// CATEGORY DIR CREATE
-const moveCategoryFile = async (RestaurentId, CategoryId, role = "CATEGORY", file) => {
+// CATEGORY DIRECTORY CREATE
+const moveCategoryFile = async (restaurentId, menuId, role = "CATEGORY", file) => {
     const CategoryDirPath = path.join(
         config.RESTAURENT_FILE_STORE_PATH,
-        RestaurentId,
-        role,
-        CategoryId.toString()
+        restaurentId,
+        role
     );
     const currentTempPath = path.join(config.FILE_STORE_PATH, "TEMP", file);
     const destinationPath = path.join(
         config.RESTAURENT_FILE_STORE_PATH,
-        RestaurentId,
+        restaurentId,
         role,
-        CategoryId.toString(),
         file
     );
-    //Check Dir Exist
-    if (!fs.existsSync(MenuDirPath)) {
-        //check first CATEGORY Dir exist in RESTAURENT folder or not
-        if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role))) {
+    debugger
+    //Check Directory Exist
+    if (!fs.existsSync(CategoryDirPath)) {
+        //check first CATEGORY Directory exist in RESTAURENT folder or not
+        if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, restaurentId, role))) {
             //Create A CATEGORY directory in RESTAURENT
-            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role)) {
-                //check first CATEGORY_ID Dir exist in CATEGORY folder or not
-                if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, CategoryId.toString()))) {
-                    //Create A CATEGORY_ID directory in CATEGORY
-                    if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, CategoryId.toString())) {
-                        //perform move file task perticuler location
-                        fs.rename(currentTempPath, destinationPath, function (errmove) {
-                            if (errmove) {
-                                throw errmove;
-                            }
-
-                        });
-
+            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, restaurentId, role)) {
+                //perform move file task perticuler location
+                fs.rename(currentTempPath, destinationPath, function (errmove) {
+                    if (errmove) {
+                        throw errmove;
                     }
-                } else {//CATEGORY_ID directory Exist in CATEGORY
-                    //perform move file task perticuler location
-                    fs.rename(currentTempPath, destinationPath, function (errmove) {
-                        if (errmove) {
-                            throw errmove;
-                        }
-                    });
+                });
+                debugger
+            }
+        } else { //CATEGORY Directory exist in RESTAURENT folder 
+            //perform move file task perticuler location
+            fs.rename(currentTempPath, destinationPath, function (errmove) {
+                if (errmove) {
+                    throw errmove;
                 }
-            }
-        } else { //CATEGORY Dir exist in RESTAURENT folder 
-            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, CategoryId.toString())) {
-                //perform move file task perticuler location
-                fs.rename(currentTempPath, destinationPath, function (errmove) {
-                    if (errmove) {
-                        throw errmove;
-                    }
-                });
-            } else {//CATEGORY_ID directory Exist in CATEGORY
-                //perform move file task perticuler location
-                fs.rename(currentTempPath, destinationPath, function (errmove) {
-                    if (errmove) {
-                        throw errmove;
-                    }
-                });
-            }
+            });
         }
     } else {
         fs.rename(currentTempPath, destinationPath, function (errmove) {
@@ -213,67 +164,42 @@ const moveCategoryFile = async (RestaurentId, CategoryId, role = "CATEGORY", fil
     }
 }
 
-
-// ITEM DIR CREATE
-const moveItemFile = async (RestaurentId, CategoryId, role = "ITEM", file) => {
-    const CategoryDirPath = path.join(
+// ITEM DIRECTORY CREATE
+const moveItemFile = async (restaurentId, categoryId, role = "ITEM", file) => {
+    const ItemDirPath = path.join(
         config.RESTAURENT_FILE_STORE_PATH,
-        RestaurentId,
-        role,
-        CategoryId.toString()
+        restaurentId,
+        role
     );
     const currentTempPath = path.join(config.FILE_STORE_PATH, "TEMP", file);
     const destinationPath = path.join(
         config.RESTAURENT_FILE_STORE_PATH,
-        RestaurentId,
+        restaurentId,
         role,
-        CategoryId.toString(),
         file
     );
-    //Check Dir Exist
-    if (!fs.existsSync(MenuDirPath)) {
-        //check first ITEM Dir exist in RESTAURENT folder or not
-        if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role))) {
-            //Create A ITEM directory in RESTAURENT
-            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role)) {
-                //check first ITEM_ID Dir exist in ITEM folder or not
-                if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, ItemId.toString()))) {
-                    //Create A ITEM_ID directory in ITEM
-                    if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, ItemId.toString())) {
-                        //perform move file task perticuler location
-                        fs.rename(currentTempPath, destinationPath, function (errmove) {
-                            if (errmove) {
-                                throw errmove;
-                            }
-
-                        });
-
+    debugger
+    //Check Directory Exist
+    if (!fs.existsSync(ItemDirPath)) {
+        //check first ITEM Directory exist in RESTAURENT folder or not
+        if (!fs.existsSync(path.join(config.RESTAURENT_FILE_STORE_PATH, restaurentId, role))) {
+            //Create A ITEM Directory in RESTAURENT
+            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, restaurentId, role)) {
+                //perform move file task perticuler location
+                fs.rename(currentTempPath, destinationPath, function (errmove) {
+                    if (errmove) {
+                        throw errmove;
                     }
-                } else {//ITEM_ID directory Exist in ITEM
-                    //perform move file task perticuler location
-                    fs.rename(currentTempPath, destinationPath, function (errmove) {
-                        if (errmove) {
-                            throw errmove;
-                        }
-                    });
+                });
+                debugger
+            }
+        } else { //ITEM Directory exist in RESTAURENT folder 
+            //perform move file task perticuler location
+            fs.rename(currentTempPath, destinationPath, function (errmove) {
+                if (errmove) {
+                    throw errmove;
                 }
-            }
-        } else { //ITEM Dir exist in RESTAURENT folder 
-            if (makeDir(config.RESTAURENT_FILE_STORE_PATH, RestaurentId, role, ItemId.toString())) {
-                //perform move file task perticuler location
-                fs.rename(currentTempPath, destinationPath, function (errmove) {
-                    if (errmove) {
-                        throw errmove;
-                    }
-                });
-            } else {//ITEM_ID directory Exist in ITEM
-                //perform move file task perticuler location
-                fs.rename(currentTempPath, destinationPath, function (errmove) {
-                    if (errmove) {
-                        throw errmove;
-                    }
-                });
-            }
+            });
         }
     } else {
         fs.rename(currentTempPath, destinationPath, function (errmove) {
@@ -283,6 +209,7 @@ const moveItemFile = async (RestaurentId, CategoryId, role = "ITEM", file) => {
         });
     }
 }
+
 
 // create Directory 
 const makeDir = async (restaurentPath, oldDirName, newDirName, iD) => {

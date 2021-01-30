@@ -1,52 +1,51 @@
 import { model } from "../models";
-
-const InsertMenuValidate = (req, LoginId) => {
+import {errorRes, successRes} from "../functions/helper"
+const checkInsertMenuValidate = (req, LoginId) => {
     return new Promise(async (resolve, reject) => {
         const keys = Object.keys(req);
 
         // Restaurent id
-        if (Array.isArray(keys) && !keys.includes("restaurentId")) {
-            resolve("Please Enter A restaurentId");
-        } else {
-            if (keys.includes("restaurentId") && req.restaurentId == "") {
-                resolve("restaurentId not be empty!");
-            }
-        }
+        // if (Array.isArray(keys) && !keys.includes("restaurentId")) {
+        //     resolve(errorRes("Please Enter A restaurentId"));
+        // } else {
+        //     if (keys.includes("restaurentId") && req.restaurentId == "") {
+        //         resolve(errorRes("restaurentId not be empty!"));
+        //     }
+        // }
 
         // Menu Name
         if (Array.isArray(keys) && !keys.includes("menuName")) {
-            resolve("Please Enter A Menu Name");
+            resolve(errorRes("Please Enter A Menu Name"));
         } else {
             if (keys.includes("menuName") && req.menuName != "") {
                 const found = await model.Menu.findOne({
                     menuName: req.menuName,
                 });
                 if (found && JSON.stringify(found.restaurentId) == JSON.stringify(req.restaurentId)) {
-                    resolve("Menu Name is Alredy Exist! Use Diffrent Name!");
+                    resolve(errorRes("Menu Name is Alredy Exist! Use Diffrent Name!"));
                 }
             }
         }
 
         // menuBanner image
         if (req.files && req.files == "" && !req.file.menuBanner) {
-            resolve("Please Upload Menu Image");
+            resolve(errorRes("Please Upload Menu Image"));
         }
 
-        resolve("");
+        resolve(successRes("valid data"));
     });
 };
 
-const UpdateMenuValidate = (req, LoginId) => {
+const checkUpdateInputValidate = (req, LoginId) => {
     return new Promise(async (resolve, reject) => {
         const keys = Object.keys(req);
 
-
         // Menu Id
         if (Array.isArray(keys) && !keys.includes("menuId")) {
-            resolve("Please Enter A menuId");
+            resolve(errorRes("Please Enter A menuId"));
         } else {
             if (keys.includes("menuId") && req.menuId == "") {
-                resolve("Please Enter A menuId");
+                resolve(errorRes("Please Enter A menuId"));   
             }
         }
 
@@ -56,14 +55,14 @@ const UpdateMenuValidate = (req, LoginId) => {
             keys.includes("menuName") &&
             req.menuName == ""
         ) {
-            resolve("Please Enter Menu Name");
+            resolve(errorRes("Please Enter Menu Name"));
         } else {
             if (keys.includes("menuName") && req.menuName != "") {
                 const found = await model.Menu.findOne({
                     menuName: req.menuName,
                 });
                 if (found && JSON.stringify(found.restaurentId) == JSON.stringify(req.restaurentId)) {
-                    resolve("Menu Name is Alredy Exist! Use Diffrent Name!");
+                    resolve(errorRes("Menu Name is Alredy Exist! Use Diffrent Name!"));
                 }
             }
         }
@@ -74,12 +73,12 @@ const UpdateMenuValidate = (req, LoginId) => {
             keys.includes("menuType") &&
             ![0, 1, 2, 3].includes(req.menuType)
         ) {
-            resolve("Please Enter Menu Type!");
+            resolve(errorRes("Please Enter Menu Type!"));
         }
 
-        resolve("");
+        resolve(successRes("valid data"));
     });
 };
 
-const MenuSchema = { InsertMenuValidate, UpdateMenuValidate };
+const MenuSchema = { checkInsertMenuValidate, checkUpdateInputValidate };
 export default MenuSchema;

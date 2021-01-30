@@ -28,7 +28,7 @@ const checkfiletype = (file, cb) => {
 };
 
 // init uploadStorage
-export const uploadStorage = pify(
+export const uploadFileToStorage = pify(
   multer({
     storage: storage,
     limits: { fileSize: 100000000 },
