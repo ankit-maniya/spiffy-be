@@ -1,6 +1,6 @@
 import express from "express";
 import { RestaurentController } from "../controllers/RestaurentController";
-import { me } from "../../functions/auth";
+import { me } from "../functions/auth";
 
 const Restaurent = express.Router();
 

@@ -1,9 +1,9 @@
-import User from "./User/User";
-import Restaurent from "./Restaurent/Restaurent";
+import User from "./User";
+import Restaurent from "./Restaurent";
 import Address from "./Address";
-import Menu from "./Restaurent/Menu";
-import Category from "./Restaurent/Category";
-import Item from "./Restaurent/Item";
+import Menu from "./Menu";
+import Category from "./Category";
+import Item from "./Item";
 import mongoose from "mongoose";
 import { config } from "../../config";
 
