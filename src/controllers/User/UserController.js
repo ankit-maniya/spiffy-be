@@ -1,12 +1,12 @@
-import { uploadFileToStorage } from "../functions/uploadfile";
+import { uploadFileToStorage } from "../../functions/uploadfile";
 import helper, {
     errorRes,
     successRes
-} from "../functions/helper";
-import { model } from "../models";
-import Userschema, { } from "../validation/UserSchema";
-import { createToken } from "../functions/auth";
-import { validatePassword } from "../models/User";
+} from "../../functions/helper";
+import { model } from "../../models";
+import Userschema, { } from "../../validation/UserSchema";
+import { createToken } from "../../functions/auth";
+import { validatePassword } from "../../models/User/User";
 
 const login = async (req, res, next) => {
     try {

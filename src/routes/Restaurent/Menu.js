@@ -1,6 +1,6 @@
 import express from "express";
 import MenuController from "../controllers/MenuController";
-import { me } from "../functions/auth";
+import { me } from "../../functions/auth";
 
 const Menu = express.Router();
 /** For Authentication  */

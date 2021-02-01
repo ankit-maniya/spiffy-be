@@ -1,7 +1,7 @@
-import helper, { errorRes, successRes, successMessage } from "../functions/helper";
-import { uploadFileToStorage } from "../functions/uploadfile";
-import { model } from "../models";
-import ItemSchema from "../validation/ItemSchema";
+import helper, { errorRes, successRes, successMessage } from "../../functions/helper";
+import { uploadFileToStorage } from "../../functions/uploadfile";
+import { model } from "../../models";
+import ItemSchema from "../../validation/ItemSchema";
 import mongoose from "mongoose"
 
 // for convert stringid to objectid

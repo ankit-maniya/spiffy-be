@@ -1,6 +1,6 @@
 import express from "express";
 import ItemController from "../controllers/ItemController";
-import { me } from "../functions/auth";
+import { me } from "../../functions/auth";
 
 const Item = express.Router();
 /** For Authentication  */

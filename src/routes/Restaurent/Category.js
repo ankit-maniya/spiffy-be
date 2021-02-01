@@ -1,6 +1,6 @@
 import express from "express";
 import CategoryController from "../controllers/CategoryController";
-import { me } from "../functions/auth";
+import { me } from "../../functions/auth";
 
 const Category = express.Router();
 /** For Authentication  */

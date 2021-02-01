@@ -1,6 +1,6 @@
 import { isEmail } from "validator";
-import { model } from "../models";
-import { errorRes, successMessage } from "../functions/helper";
+import { model } from "../../models";
+import { errorRes, successMessage } from "../../functions/helper";
 
 
 const checkSignupInputValidate = (req) => {

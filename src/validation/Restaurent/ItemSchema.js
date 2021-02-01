@@ -1,5 +1,5 @@
-import { model } from "../models";
-import { errorRes, successMessage } from "../functions/helper"
+import { model } from "../../models";
+import { errorRes, successMessage } from "../../functions/helper"
 const checkInsertInputValidate = (req, LoginId) => {
     return new Promise(async (resolve, reject) => {
         const keys = Object.keys(req);

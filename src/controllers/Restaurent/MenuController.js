@@ -1,7 +1,7 @@
-import helper, { errorRes, successRes, successMessage } from "../functions/helper";
-import { uploadFileToStorage } from "../functions/uploadfile";
-import { model } from "../models";
-import MenuSchema from "../validation/MenuSchema";
+import helper, { errorRes, successRes, successMessage } from "../../functions/helper";
+import { uploadFileToStorage } from "../../functions/uploadfile";
+import { model } from "../../models";
+import MenuSchema from "../../validation/MenuSchema";
 import mongoose from "mongoose"
 
 // for convert stringid to objectid
@@ -84,6 +84,8 @@ const updateMenu = async (req, res, next) => {
         bodyData.isDelete ? bodyData["isDelete"] = parseInt(bodyData.isDelete) : 0
         bodyData.isApproved ? bodyData["isApproved"] = parseInt(bodyData.isApproved) : 0
         bodyData.menuType ? bodyData["menuType"] = parseInt(bodyData.menuType) : 0
+        // update edited time
+        bodyData["updatedAt"] = new Date();
 
         const isValidate = await MenuSchema.checkUpdateInputValidate(bodyData, restaurentId); // validate a key and value
         if (isValidate.statuscode != 1) {
