@@ -1,5 +1,5 @@
 import { model } from "../models";
-import {errorRes, successRes} from "../functions/helper"
+import { errorRes, successMessage } from "../functions/helper"
 const checkInsertMenuValidate = (req, LoginId) => {
     return new Promise(async (resolve, reject) => {
         const keys = Object.keys(req);
@@ -32,7 +32,7 @@ const checkInsertMenuValidate = (req, LoginId) => {
             resolve(errorRes("Please Upload Menu Image"));
         }
 
-        resolve(successRes("valid data"));
+        resolve(successMessage("valid data"));
     });
 };
 
@@ -45,7 +45,7 @@ const checkUpdateInputValidate = (req, LoginId) => {
             resolve(errorRes("Please Enter A menuId"));
         } else {
             if (keys.includes("menuId") && req.menuId == "") {
-                resolve(errorRes("Please Enter A menuId"));   
+                resolve(errorRes("Please Enter A menuId"));
             }
         }
 
@@ -76,9 +76,44 @@ const checkUpdateInputValidate = (req, LoginId) => {
             resolve(errorRes("Please Enter Menu Type!"));
         }
 
-        resolve(successRes("valid data"));
+        // isActive
+        if (
+            Array.isArray(keys) &&
+            keys.includes("isActive") &&
+            ![0, 1].includes(req.isActive)
+        ) {
+            debugger
+            resolve(errorRes("Please Enter isActive type!"));
+        }
+
+        // isDelete
+        if (
+            Array.isArray(keys) &&
+            keys.includes("isDelete") &&
+            ![0, 1].includes(req.isDelete)
+        ) {
+            debugger
+            resolve(errorRes("Please Enter Proper isDelete type!"));
+        }
+
+        resolve(successMessage("valid data"));
     });
 };
 
-const MenuSchema = { checkInsertMenuValidate, checkUpdateInputValidate };
+const checkDeleteInputValidate = (req) => {
+    return new Promise(async (resolve, reject) => {
+        const keys = Object.keys(req);
+
+        if (Array.isArray(keys) && !keys.includes("menuId")) {
+            resolve(errorRes("MenuId is Required!"));
+        } else {
+            if (keys.includes("menuId") && !req.menuId) {
+                resolve(errorRes("MenuId is Can't be Empty!"));
+            }
+        }
+        resolve(successMessage("valid data"))
+    })
+}
+
+const MenuSchema = { checkInsertMenuValidate, checkUpdateInputValidate, checkDeleteInputValidate };
 export default MenuSchema;

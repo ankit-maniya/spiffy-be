@@ -1,6 +1,6 @@
 import { isEmail } from "validator";
 import { model } from "../models";
-import { errorRes, successRes } from "../functions/helper";
+import { errorRes, successMessage } from "../functions/helper";
 
 
 const checkSignupInputValidate = (req) => {
@@ -79,7 +79,7 @@ const checkSignupInputValidate = (req) => {
                     resolve(errorRes("password && repassword! Both Password Not Match"));
             }
         }
-        resolve(successRes("valid data"));
+        resolve(successMessage("valid data"));
     });
 };
 
@@ -103,7 +103,7 @@ const checkLoginInputValidate = async (req) => {
             resolve(errorRes("Please Enter password"));
         }
 
-        resolve(successRes("valid data"));
+        resolve(successMessage("valid data"));
     });
 };
 
@@ -188,7 +188,27 @@ const checkUpdateUserInputValidate = (req, LoginId) => {
                 }
             }
         }
-        resolve(successRes("valid data"));
+
+        // isActive
+        if (
+            Array.isArray(keys) &&
+            keys.includes("isActive") &&
+            ![0, 1].includes(req.isActive)
+        ) {
+            resolve(errorRes("Please Enter isActive type!"));
+        }
+
+         // isDelete
+         if (
+            Array.isArray(keys) &&
+            keys.includes("isDelete") &&
+            ![0, 1].includes(req.isDelete)
+        ) {
+            resolve(errorRes("Please Enter Proper isDelete type!"));
+        }
+
+
+        resolve(successMessage("valid data"));
     });
 };
 

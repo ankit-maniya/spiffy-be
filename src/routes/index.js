@@ -2,6 +2,8 @@ import express from "express";
 import User from "./User";
 import Restaurent from "./Restaurent";
 import Menu from "./Menu";
+import Category from "./Category";
+import Item from "./Item";
 const route = express.Router();
 
 route.get("/", (req, res, next) => {
@@ -16,5 +18,11 @@ route.use("/restaurent", Restaurent);
 
 /** Menu */
 route.use("/menu", Menu);
+
+/** Category */
+route.use("/category", Category);
+
+/** Item */
+route.use("/item", Item);
 
 export default route;

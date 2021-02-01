@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const ObjectId = mongoose.Schema.Types.ObjectId;
-const MenuSchema = new mongoose.Schema(
+const ItemSchema = new mongoose.Schema(
     {
-        menuName: {
+        itemName: {
             type: String,
             required: true,
         },
@@ -12,19 +12,37 @@ const MenuSchema = new mongoose.Schema(
             ref: "restaurent",
             required: true,
         },
-        menuBanner: {
+        menuId: {
+            type: ObjectId,
+            ref: "menu",
+            required: true,
+        },
+        categoryId: {
+            type: ObjectId,
+            ref: "category",
+            required: true,
+        },
+        itemBanner: {
             type: String,
             required: true,
+        },
+        itemPrice: {
+            type: Number,
+            required: true,
+        },
+        itemDescription: {
+            type: String,
+            default: "",
         },
         isApproved: {
             type: Number,
             default: 0,
-            enum: [0, 1, 2], //0 for pending, 1 for approved, 2 for rejected
+            enum: [0, 1, 2], //0 = pending, 1 = approved, 2 = rejected
         },
-        menuType: {
+        itemType: {
             type: Number,
             default: 0,
-            enum: [0, 1, 2, 3], //0 for not decided, 1 for veg, 2 for nonveg, 3 for both
+            enum: [0, 1, 2, 3], //0 = not decided, 1 = veg, 2 = nonveg, 3 = both
         },
         isActive: {
             type: Boolean,
@@ -40,5 +58,5 @@ const MenuSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const Menu = mongoose.model("menu", MenuSchema);
-export default Menu;
+const Item = mongoose.model("item", ItemSchema);
+export default Item;

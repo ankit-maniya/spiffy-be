@@ -13,7 +13,7 @@ const login = async (req, res, next) => {
         const bodyData = req.body;
         const isValidate = await Userschema.checkLoginInputValidate(bodyData); //validate a key and value
         if (isValidate.statuscode != 1) {
-            throw {message:isValidate.message}
+            throw { message: isValidate.message }
         }
         const iUser = await model.User.findOne({
             //find user with this mobile
@@ -65,6 +65,8 @@ const updateUser = async (req, res, next) => {
         await uploadFileToStorage(req, res); // upload file using multer as a middle ware
         const { _id, profile } = req.user; // login user bodyData
         const updateData = JSON.parse(JSON.stringify(req.body)); // remove unusual [obj]
+        // update edited time
+        bodyData["updatedAt"] = new Date();
         const isValidate = await Userschema.checkUpdateUserInputValidate(updateData, _id); // validate a key and value
         if (isValidate.statuscode != 1) {
             if (req.files && req.files.profile && req.files.profile[0].filename) {

@@ -2,6 +2,8 @@ import User from "./User";
 import Restaurent from "./Restaurent";
 import Address from "./Address";
 import Menu from "./Menu";
+import Category from "./Category";
+import Item from "./Item";
 import mongoose from "mongoose";
 import { config } from "../../config";
 
@@ -19,4 +21,6 @@ export const model = {
   Restaurent,
   Address,
   Menu,
+  Category,
+  Item,
 };
