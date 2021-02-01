@@ -1,9 +1,10 @@
 import express from "express";
 import User from "./User";
-import Restaurent from "./Restaurent";
+import Store from "./Store";
 import Menu from "./Menu";
 import Item from "./Item";
 import Category from "./Category";
+import Order from "./Comman/Order";
 const route = express.Router();
 
 route.get("/", (req, res, next) => {
@@ -13,8 +14,8 @@ route.get("/", (req, res, next) => {
 /** User */
 route.use("/user", User);
 
-/** Restaurent */
-route.use("/restaurent", Restaurent);
+/** Store */
+route.use("/store", Store);
 
 /** Menu */
 route.use("/menu", Menu);
@@ -24,5 +25,8 @@ route.use("/category", Category);
 
 /** Item */
 route.use("/item", Item);
+
+/** Order */
+route.use("/order", Order);
 
 export default route;

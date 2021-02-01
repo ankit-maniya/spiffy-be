@@ -173,7 +173,7 @@ const updateRestaurent = async (req, res, next) => {
   }
 };
 
-export const RestaurentController = {
+export const StoreController = {
   signUp,
   logIn,
   updateRestaurent,
